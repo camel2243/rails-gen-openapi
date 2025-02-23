@@ -13,8 +13,8 @@ namespace :routes_to_openapi do
     end
 
     begin
-      RailsRoutesToOpenAPI.convert(routes_output)
-      puts 'OpenAPI v3 YAML file generated successfully.'
+      file_name = RailsRoutesToOpenAPI.convert(routes_output)
+      puts "OpenAPI v3 YAML file generated successfully: #{file_name}"
     rescue => e
       puts "Failed to generate OpenAPI YAML file."
       puts e.message

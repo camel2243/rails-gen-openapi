@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "rails_routes_to_openapi"
-  spec.version       = "0.1.0"
+  spec.version       = "0.1.2"
   spec.authors       = ["Camel Chang"]
   spec.email         = ["a556622821@gmail.com"]
   spec.summary       = "Convert Rails routes to OpenAPI YAML"
@@ -10,6 +10,7 @@ Gem::Specification.new do |spec|
   spec.metadata      = {
     "source_code_uri" => "https://github.com/camel2243/rails-gen-openapi",
     "homepage_uri"    => "https://github.com/camel2243/rails-gen-openapi",
+    "documentation_uri" => "https://github.com/camel2243/rails-gen-openapi/blob/main/README.md"
   }
 
   spec.files         = Dir["lib/**/*", "Rakefile", "README.md"]

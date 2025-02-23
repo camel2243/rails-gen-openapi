@@ -25,6 +25,7 @@ module RailsRoutesToOpenAPI
     output_file = "openapi_v3.1_#{timestamp}.yml"
 
     File.open(output_file, "w") { |file| file.write(yaml_format) }
+    output_file
   end
 end
 
