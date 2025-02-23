@@ -1,6 +1,6 @@
 # Converting a Rails Routes Output into a Postman Collection
 
-In an effort to learn a little bit about Ruby and Rails, I decided a fun project would be to attempt generating a YAML file that aligns with the OpenAPI v3.1.0 specification. This file can then be imported into Postman so you can test Rails routes without manually using the Rails console or the consuming frontend application.
+In an effort to learn a little bit about Ruby and Rails, I decided a fun project would be to attempt generating a YAML file that aligns with the [OpenAPI v3.1.0 specification](https://spec.openapis.org/oas/v3.1.1.html). This file can then be imported into Postman so you can test Rails routes without manually using the Rails console or the consuming frontend application.
 
 ## Quick Start
 
