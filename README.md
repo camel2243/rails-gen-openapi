@@ -24,7 +24,8 @@ bundle exec rake routes_to_openapi:convert
 
 This task will internally run `rails routes` on your Rails application and generate an OpenAPI YAML file named similar to `openapi_v3.1_YYYYMMDDHHMMSS.yml` in the project root.
 
-> [!WARNING] > **Tip:** Ensure you run the task within a Rails project context so that it can properly pull the routes.
+> [!WARNING]
+> **Tip:** Ensure you run the task within a Rails project context so that it can properly pull the routes.
 
 ## Workflow Overview
 
