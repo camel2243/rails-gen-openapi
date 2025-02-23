@@ -1,5 +1,5 @@
 require "rake"
-require_relative "lib/rails_routes_to_openapi"
+require_relative "../rails_routes_to_openapi"
 
 namespace :routes_to_openapi do
   desc "Convert Rails routes to OpenAPI YAML"
