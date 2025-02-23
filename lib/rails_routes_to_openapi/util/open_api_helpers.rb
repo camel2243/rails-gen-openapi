@@ -1,26 +1,19 @@
-require "dry/monads"
-require "dry/monads/do"
 require "deep_merge"
 require_relative "../structs/open_api"
 
 module Util
   class OpenAPIHelpers
     class << self
-      include Dry::Monads[:result]
-      include Dry::Monads::Do.for(:call)
-
       # Takes an array of RouteInfo types and generates the OpenAPI v3 spec
       # to write into YAML and export to a file.
-      def call(file_data)
-        param_friendly_file_data = yield convert_params_to_compatible_format(file_data)
-        paths_hash = yield write_paths_hash(param_friendly_file_data)
-        open_api_compliant_hash = yield write_open_api_compliant_hash(paths_hash)
-
-        Success(open_api_compliant_hash)
+      def convert(route_info)
+        param_friendly_route_info = convert_params_to_compatible_format(route_info)
+        paths_hash = write_paths_hash(param_friendly_route_info)
+        write_open_api_compliant_hash(paths_hash)
       end
 
-      def convert_params_to_compatible_format(file_data)
-        res = file_data.map { |info|
+      def convert_params_to_compatible_format(route_info)
+        route_info.map { |info|
           # Remove (.:format) from uri_pattern
           update_string = info.uri_pattern.gsub(/\(\.:format\)/, '')
           
@@ -31,12 +24,8 @@ module Util
 
           Structs::RouteInfo.new(verb: info.verb, controller_action: info.controller_action, uri_pattern: update_string)
         }
-
-        Success(res)
-      rescue => e
-        # ! Maybe I should be passing the errors as an object with message + stack trace
-        puts e
-        Failure("Could not convert params from :param to {param} format")
+      rescue
+        raise 'Could not convert params from :param to {param} format'
       end
 
       # ! To be honest, I feel like all of this should be cleaned up.
@@ -54,9 +43,9 @@ module Util
         Structs::OpenAPI::Verb.new(summary: info.controller_action).attributes
       end
 
-      def write_paths_hash(file_data)
+      def write_paths_hash(route_info)
         paths_hash = {}
-        file_data.each do |info|
+        route_info.each do |info|
           # Simplify the GET part - assume all other REST verbs require a request body
           if info.verb == "GET"
             paths_hash.deep_merge!({info.uri_pattern => {info.verb.downcase => get_verb(info)}})
@@ -64,11 +53,9 @@ module Util
             paths_hash.deep_merge!({info.uri_pattern => {info.verb.downcase => get_verb_with_req_body(info)}})
           end
         end
-
-        Success(paths_hash)
-      rescue => e
-        puts e
-        Failure("Could not write paths for hash")
+        paths_hash
+      rescue
+        raise 'Could not write paths for hash'
       end
 
       def write_open_api_compliant_hash(paths_hash)
@@ -80,11 +67,9 @@ module Util
         servers = [{url: "https://api.example.com", description: "Base URL for the API"}]
 
         # This ends up the final hash to write to disk.
-        open_api_hash = Structs::OpenAPI::Base.new(openapi: "3.1.0", info: info, servers: servers, paths: paths_hash).attributes
-
-        Success(open_api_hash)
+        Structs::OpenAPI::Base.new(openapi: "3.1.0", info: info, servers: servers, paths: paths_hash).attributes
       rescue
-        Failure("Could not write YAML file")
+        raise 'Could not write OpenAPI compliant hash'
       end
     end
   end
