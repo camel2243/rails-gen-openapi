@@ -7,6 +7,10 @@ Gem::Specification.new do |spec|
   spec.description   = "A gem to convert Rails routes to OpenAPI YAML for Postman import"
   spec.homepage      = "https://github.com/camel2243/rails-gen-openapi"
   spec.license       = "Apache-2.0"
+  spec.metadata      = {
+    "source_code_uri" => "https://github.com/camel2243/rails-gen-openapi",
+    "homepage_uri"    => "https://github.com/camel2243/rails-gen-openapi",
+  }
 
   spec.files         = Dir["lib/**/*", "Rakefile", "README.md"]
   spec.bindir        = "exe"
