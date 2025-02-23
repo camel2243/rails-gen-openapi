@@ -16,20 +16,18 @@ opts = Slop.parse { |o|
   end
 }
 
-# ! This hack sucks - what is better? hash.transform_keys(&:to_s) didn't help me on Ruby 2.6.6.
 class ::Hash
-  # via https://stackoverflow.com/a/25835016/2257038
-  def stringify_keys
-    h = map { |k, v|
-      v_str = if v.instance_of? Hash
-        v.stringify_keys
-      else
-        v
-      end
-
-      [k.to_s, v_str]
-    }
-    Hash[h]
+  def deep_stringify_keys
+    each_with_object({}) do |(k, v), h|
+      h[k.to_s] = case v
+                  when Hash
+                    v.deep_stringify_keys
+                  when Array
+                    v.map { |i| i.is_a?(Hash) ? i.deep_stringify_keys : i }
+                  else
+                    v
+                  end
+    end
   end
 end
 
@@ -42,7 +40,7 @@ end
 
 handle_success = lambda do |success|
   # ! I really detest this hack. There needs to be a better way.
-  res = success.to_hash.stringify_keys
+  res = success.to_hash.deep_stringify_keys
 
   # Write OpenAPI output to YAML file
   # puts success

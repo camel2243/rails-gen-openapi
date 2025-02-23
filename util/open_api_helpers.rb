@@ -21,9 +21,11 @@ module Util
 
       def convert_params_to_compatible_format(file_data)
         res = file_data.map { |info|
-          # Wanky patter to turn something like /a/b/:param/d
-          # to /a/b/{param}/d for OpenAPI standards
-          update_string = info.uri_pattern.split("/").map { |uri|
+          # Remove (.:format) from uri_pattern
+          update_string = info.uri_pattern.gsub(/\(\.:format\)/, '')
+          
+          # Turn something like /a/b/:param/d to /a/b/{param} for OpenAPI standards
+          update_string = update_string.split("/").map { |uri|
             uri[0] == ":" ? "{#{uri[1..]}}" : uri
           }.join("/")
 
@@ -52,15 +54,14 @@ module Util
         Structs::OpenAPI::Verb.new(summary: info.controller_action).attributes
       end
 
-      # ! Better alternative to in-place deep merging? Would rather not use impurities.
       def write_paths_hash(file_data)
         paths_hash = {}
         file_data.each do |info|
           # Simplify the GET part - assume all other REST verbs require a request body
           if info.verb == "GET"
-            paths_hash.deep_merge({info.uri_pattern => Hash[info.verb.to_s.downcase, get_verb(info)]})
+            paths_hash.deep_merge!({info.uri_pattern => {info.verb.downcase => get_verb(info)}})
           else
-            paths_hash.deep_merge({info.uri_pattern => Hash[info.verb.to_s.downcase, get_verb_with_req_body(info)]})
+            paths_hash.deep_merge!({info.uri_pattern => {info.verb.downcase => get_verb_with_req_body(info)}})
           end
         end
 
@@ -72,15 +73,15 @@ module Util
 
       def write_open_api_compliant_hash(paths_hash)
         info = {
-          title: "Culture Amp - Performance API",
-          description: "Hotfix to add all routes to Postman",
-          # Related to v1 API versioning for REST
-          version: "1.0.0",
+          title: "Rails Routes to OpenAPI",
+          description: "Generate an OpenAPI v3.1 YAML file for Postman import",
+          version: "1.1.0",
         }
-        servers = {url: "http://localhost:7000", description: "Local dev environment"}
+        servers = [{url: "https://api.example.com", description: "Base URL for the API"}]
 
         # This ends up the final hash to write to disk.
-        open_api_hash = Structs::OpenAPI::Base.new(openapi: "3.0.0", info: info, servers: servers, paths: paths_hash).attributes
+        open_api_hash = Structs::OpenAPI::Base.new(openapi: "3.1.0", info: info, servers: servers, paths: paths_hash).attributes
+
         Success(open_api_hash)
       rescue
         Failure("Could not write YAML file")

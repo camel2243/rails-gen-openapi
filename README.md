@@ -1,6 +1,6 @@
 # Converting a rails routes output into a Postman Collection
 
-In an effort to learn a little bit about Ruby and Rails, I decided a fun project would be to attempt generating a YAML file that aligns to the OpenAPI v3.0 specification that I could import into Postman and test routes without manually having to do things via the Rails console and/or the consuming frontend application.
+In an effort to learn a little bit about Ruby and Rails, I decided a fun project would be to attempt generating a YAML file that aligns to the OpenAPI v3.1.0 specification that I could import into Postman and test routes without manually having to do things via the Rails console and/or the consuming frontend application.
 
 As this relates to what could be important information, I am going to redact as much as possible.
 
@@ -138,13 +138,13 @@ servers:
   url: http://localhost:7000
   description: Local dev environment
 paths:
-  '/':
+  "/":
     get:
       summary: home#show
-  '/path/to/authorize/native':
+  "/path/to/authorize/native":
     get:
       summary: doorkeeper/authorizations#show
-  '/path/to/authorize':
+  "/path/to/authorize":
     get:
       summary: doorkeeper/authorizations#new
     delete:

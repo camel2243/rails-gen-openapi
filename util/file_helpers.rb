@@ -12,8 +12,8 @@ module Util
       def call(file)
         file_data = yield read(file)
         split_file_data = yield split(file_data)
-        stripped_file_data = yield strip(split_file_data)
-        route_info = yield create_route_info(stripped_file_data)
+        filtered_file_data = yield filter_header(split_file_data)
+        route_info = yield create_route_info(filtered_file_data)
         Success(route_info)
       end
 
@@ -34,27 +34,27 @@ module Util
         Failure("Failed to split file lines")
       end
 
-      # Accepts string array and maps and strips all whitespace
-      def strip(file_content_array)
-        arr = file_content_array.map { |line|
-          line.strip
-        }
-
-        Success(arr)
+      # Filter out the header line
+      def filter_header(file_content_array)
+        # Assuming the first line is the header
+        Success(file_content_array.drop(1))
       rescue
-        Failure("Failed to strip white space")
+        Failure("Failed to filter header line")
       end
 
       # Accepts string array from file line
-      def create_route_info(stripped_file_data)
-        # split on spaces
-        route_info_arr = stripped_file_data.map { |line|
-          route_info = line.split(/\s+/)
-          # ! Is the a way to make this easier to read? Array destructuring?
-          # I tried to splat with **route_info but alas, no tomato. Maybe the
-          # named params don't marry up to the constructor?
-          Structs::RouteInfo.new(verb: route_info[0], uri_pattern: route_info[1], controller_action: route_info[2])
-        }
+      def create_route_info(file_data)
+        # Use regex to split each line into prefix, verb, uri_pattern, and controller_action
+        route_info_arr = file_data.flat_map { |line|
+          next if line.empty?
+          match = line.match(/^\s*(\S*)\s*(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)?\s+(\S+)\s+(.+)\s*$/)
+          if match
+            prefix, verb, uri_pattern, controller_action = match.captures
+            # Split the verb by '|' if it exists, otherwise default to 'GET'
+            verbs = verb&.split('|') || ['GET']
+            verbs.map { |v| Structs::RouteInfo.new(verb: v, uri_pattern: uri_pattern, controller_action: controller_action) }
+          end
+        }.compact
         Success(route_info_arr)
       rescue
         Failure("Failed to map line content to RouteInfo")
