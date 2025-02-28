@@ -30,7 +30,7 @@ module Util
         # Use regex to split each line into prefix, verb, uri_pattern, and controller_action
         file_data.flat_map { |line|
           next if line.empty?
-          match = line.match(/^\s*(\S*)\s*(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)?\s+(\S+)\s+(.+)\s*$/)
+          match = line.match(/^\s*(\S*)\s*((?:(?:GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)(?:\|)?)+)\s+(\S+)\s+(.+)\s*$/)
           if match
             prefix, verb, uri_pattern, controller_action = match.captures
             # Split the verb by '|' if it exists, otherwise default to 'GET'
