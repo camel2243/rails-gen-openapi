@@ -1,10 +1,10 @@
 Gem::Specification.new do |spec|
   spec.name          = "rails_routes_to_openapi"
-  spec.version       = "0.1.2"
+  spec.version       = "0.1.3"
   spec.authors       = ["Camel Chang"]
   spec.email         = ["a556622821@gmail.com"]
   spec.summary       = "Convert Rails routes to OpenAPI YAML"
-  spec.description   = "A gem to convert Rails routes to OpenAPI YAML for Postman import"
+  spec.description   = "A gem to convert Rails routes to OpenAPI v3.1 YAML"
   spec.homepage      = "https://github.com/camel2243/rails-gen-openapi"
   spec.license       = "Apache-2.0"
   spec.metadata      = {
